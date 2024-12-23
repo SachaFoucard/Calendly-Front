@@ -82,7 +82,7 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
         console.log("createMeeting", createMeeting);
 
         try {
-            const response = await fetch('https://calendly-back.onrender.com/api/meetings/add', {
+            const response = await fetch('https://calendy-back.vercel.app/api/api/meetings/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
