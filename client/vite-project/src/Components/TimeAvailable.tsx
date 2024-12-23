@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { CalendarContext } from '../Context/CalendarContext';
 import Form from '../Components/Form';
 import { parseISO, addHours, isEqual, format, isBefore } from 'date-fns';
@@ -10,11 +10,12 @@ export default function TimeAvailable() {
     const [meetingsOfDay, setMeetingsOfDay] = useState<any[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [openForm, setOpenForm] = useState<boolean>(false);
-
+    const [loading, Setloading] = useState(false)
 
     // Fetch meetings for the selected day
     const fetchMeetingsByDay = async (isoDay: string) => {
         try {
+            Setloading(true)
             const cleanedDate = isoDay.split('+')[0];
 
             const response = await fetch(
@@ -26,26 +27,26 @@ export default function TimeAvailable() {
             }
             const meetings = await response.json();
             setMeetingsOfDay(meetings);
+            Setloading(false)
         } catch (error) {
             console.error('Error fetching meetings:', error);
         }
     };
 
     // Generate time slots for the selected day from 9:00 AM to 6:00 PM
-    const generateSlots = (isoDay: string) => {
+    const generateSlots = useCallback((isoDay: string) => {
         const baseDate = parseISO(isoDay);
         const slots: string[] = [];
         for (let hour = 9; hour < 19; hour++) {
             slots.push(addHours(baseDate, hour).toISOString());
         }
         return slots;
-    };
+    }, []);
 
     // Check if a slot is disabled
-    const isSlotDisabled = (slot: string) => {
-
+    const isSlotDisabled = useCallback((slot: string) => {
         const now = new Date();
-        const slotDate = parseISO(slot)
+        const slotDate = parseISO(slot);
 
         return (
             isBefore(slotDate, now) || meetingsOfDay.some(
@@ -53,7 +54,7 @@ export default function TimeAvailable() {
                     isEqual(parseISO(meeting.startTime), parseISO(slot)) &&
                     meeting.isAvailable === "false"
             ));
-    };
+    }, [meetingsOfDay]);
 
     // Format time to display it as "11:00"
     const formatTime = (isoTime: string): string => {
@@ -72,11 +73,21 @@ export default function TimeAvailable() {
             fetchMeetingsByDay(dayClicked.toString());
             setAvailableSlots(generateSlots(dayClicked.toString()));
         }
-    }, [dayClicked]);
-    {
-        console.log('meetingsOfDay', meetingsOfDay);
 
-    }
+    }, [dayClicked]);
+
+    if (loading) return (<>
+        <div className='flex justify-center fixed inset-0 items-center'>
+            <div className="float-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                role="status">
+                <span
+                    className="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]"
+                >Loading...</span>            </div>
+        </div>
+
+    </>
+    )
+
     return (
         <>
             <h1 className="m-5 font-bold text-3xl">Available Time Slots</h1>
