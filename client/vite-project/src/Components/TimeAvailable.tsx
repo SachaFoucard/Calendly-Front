@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { CalendarContext } from '../Context/CalendarContext';
 import Form from '../Components/Form';
-import { parseISO, addHours, isEqual, format } from 'date-fns';
+import { parseISO, addHours, isEqual, format, isBefore } from 'date-fns';
 
 export default function TimeAvailable() {
     const { dayClicked } = useContext(CalendarContext);
@@ -11,11 +11,12 @@ export default function TimeAvailable() {
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [openForm, setOpenForm] = useState<boolean>(false);
 
+
     // Fetch meetings for the selected day
     const fetchMeetingsByDay = async (isoDay: string) => {
         try {
             const cleanedDate = isoDay.split('+')[0];
-            
+
             const response = await fetch(
                 `https://calendy-back.vercel.app/api/meetings/day?day=${cleanedDate}`
             );
@@ -42,11 +43,16 @@ export default function TimeAvailable() {
 
     // Check if a slot is disabled
     const isSlotDisabled = (slot: string) => {
-        return meetingsOfDay.some(
-            (meeting) =>
-                isEqual(parseISO(meeting.startTime), parseISO(slot)) &&
-                meeting.isAvailable === "false"
-        );
+
+        const now = new Date();
+        const slotDate = parseISO(slot)
+
+        return (
+            isBefore(slotDate, now) || meetingsOfDay.some(
+                (meeting) =>
+                    isEqual(parseISO(meeting.startTime), parseISO(slot)) &&
+                    meeting.isAvailable === "false"
+            ));
     };
 
     // Format time to display it as "11:00"
@@ -67,10 +73,10 @@ export default function TimeAvailable() {
             setAvailableSlots(generateSlots(dayClicked.toString()));
         }
     }, [dayClicked]);
-{
-    console.log('meetingsOfDay',meetingsOfDay);
-    
-}
+    {
+        console.log('meetingsOfDay', meetingsOfDay);
+
+    }
     return (
         <>
             <h1 className="m-5 font-bold text-3xl">Available Time Slots</h1>
@@ -88,13 +94,12 @@ export default function TimeAvailable() {
                             key={slot}
                             onClick={() => !isDisabled && onSelectSlot(slot)}
                             disabled={isDisabled}
-                            className={`p-3 md:p-5 rounded-lg text-sm font-medium ${
-                                selectedSlot === slot
-                                    ? 'bg-blue-600 text-white'
-                                    : isDisabled
+                            className={`p-3 md:p-5 rounded-lg text-sm font-medium ${selectedSlot === slot
+                                ? 'bg-blue-600 text-white'
+                                : isDisabled
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     : 'bg-white border border-gray-300 text-gray-700 hover:border-blue-500'
-                            }`}
+                                }`}
                         >
                             {formatTime(slot)}
                         </button>
@@ -105,7 +110,7 @@ export default function TimeAvailable() {
             {openForm && selectedSlot && (
                 <Form
                     isActive={openForm}
-                    dayInformation={dayClicked ? dayClicked?.toString(): ''}
+                    dayInformation={dayClicked ? dayClicked?.toString() : ''}
                     hourSelected={selectedSlot}
                 />
             )}
