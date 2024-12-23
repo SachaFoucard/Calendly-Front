@@ -12,7 +12,7 @@ const Admin = () => {
       const isoDate = queryDate.toISOString();
       
       const data = await fetch(
-        `https://calendly-back.onrender.com/api/weeklyMeetings?date=${isoDate}`
+        `https://calendy-back.vercel.app/api/weeklyMeetings?date=${isoDate}`
       );
   
       if (!data.ok) {
