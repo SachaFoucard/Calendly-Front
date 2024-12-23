@@ -8,6 +8,7 @@ const CalendarBooking = () => {
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
     const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+    const [today, setToday] = useState(new Date())
 
     const { setDayClicked } = useContext(CalendarContext);
 
@@ -23,10 +24,15 @@ const CalendarBooking = () => {
 
     const handleDateClick = (dayNumber: number) => {
         const selectedDate = new Date(currentYear, currentMonth, dayNumber);
-        console.log('selectedDate',selectedDate);
-        
+        console.log('selectedDate', selectedDate);
+
         setSelectedDay(selectedDate); // Update selected day
         setDayClicked(formatISO(selectedDate)); // Set ISO date in context
+    };
+    const isPastDate = (day: number) => {
+        const today = new Date();
+        const dateToCheck = new Date(currentYear, currentMonth, day);
+        return dateToCheck < new Date(today.setHours(0, 0, 0, 0));
     };
 
     const handlePreviousMonth = () => {
@@ -46,8 +52,9 @@ const CalendarBooking = () => {
             setCurrentMonth((prevMonth) => prevMonth + 1);
         }
     };
-
+   
     return (
+        <>
         <div className="p-6 bg-white shadow rounded-lg">
             <div className="flex items-center justify-between mb-4">
                 <button
@@ -83,12 +90,14 @@ const CalendarBooking = () => {
                     })();
 
                     return (
-                        <button
+                         <button
                             key={day}
                             onClick={() => handleDateClick(day)}
+                            disabled={isPastDate(day)}
                             className={`p-2 w-10 h-10 rounded-md flex items-center justify-center 
                                 ${isSelected ? 'bg-blue-600 text-white' : 'bg-blue-100 hover:bg-blue-300'}
-                                ${isToday && !isSelected ? 'border-2 border-red-500' : ''}`}
+                                ${isToday && !isSelected ? 'border-2 border-red-500' : ''}
+                                ${isPastDate(day) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {day}
                         </button>
@@ -96,6 +105,7 @@ const CalendarBooking = () => {
                 })}
             </div>
         </div>
+        </>
     );
 };
 
