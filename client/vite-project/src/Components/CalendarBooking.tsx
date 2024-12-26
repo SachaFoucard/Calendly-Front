@@ -8,7 +8,6 @@ const CalendarBooking = () => {
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
     const [selectedDay, setSelectedDay] = useState<Date | null>(null);
-    const [today, setToday] = useState(new Date())
 
     const { setDayClicked } = useContext(CalendarContext);
 

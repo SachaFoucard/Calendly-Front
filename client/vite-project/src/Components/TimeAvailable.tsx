@@ -1,11 +1,12 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { CalendarContext } from '../Context/CalendarContext';
 import Form from '../Components/Form';
-import { parseISO, addHours, isEqual, format, isBefore } from 'date-fns';
+import { parseISO, addHours, isEqual, format, isBefore, startOfToday } from 'date-fns';
 
 export default function TimeAvailable() {
     const { dayClicked } = useContext(CalendarContext);
 
+    const [currentDay, setCurrentDay] = useState<Date>(startOfToday());
     const [availableSlots, setAvailableSlots] = useState<string[]>([]);
     const [meetingsOfDay, setMeetingsOfDay] = useState<any[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -34,8 +35,8 @@ export default function TimeAvailable() {
     };
 
     // Generate time slots for the selected day from 9:00 AM to 6:00 PM
-    const generateSlots = useCallback((isoDay: string) => {
-        const baseDate = parseISO(isoDay);
+    const generateSlots = useCallback((date: Date | string) => {
+        const baseDate = typeof date === 'string' ? parseISO(date) : date;
         const slots: string[] = [];
         for (let hour = 9; hour < 19; hour++) {
             slots.push(addHours(baseDate, hour).toISOString());
@@ -69,11 +70,10 @@ export default function TimeAvailable() {
 
     // Effect to run on `dayClicked` change
     useEffect(() => {
-        if (dayClicked) {
-            fetchMeetingsByDay(dayClicked.toString());
-            setAvailableSlots(generateSlots(dayClicked.toString()));
-        }
-
+        const dayToUse = dayClicked ? parseISO(dayClicked.toString()) : currentDay;
+        setCurrentDay(dayToUse);
+        fetchMeetingsByDay(dayToUse.toISOString());
+        setAvailableSlots(generateSlots(dayToUse));
     }, [dayClicked]);
 
     if (loading) return (<>
