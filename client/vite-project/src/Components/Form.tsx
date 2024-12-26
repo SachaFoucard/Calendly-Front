@@ -52,7 +52,7 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
         setFormattedEndTime(formattedEndTime);
         setIsoEndTime(isoEndTime);
     };
-
+    
     useEffect(() => {
 
         if (dayInformation && hourSelected) {
@@ -64,7 +64,7 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
     }, [dayInformation, hourSelected]);
 
     // Handle form submission
-    const onSubmit: SubmitHandler<Meeting> = async (data) => {
+    const onSubmit: SubmitHandler<Meeting> = async (data:any) => {
         if (!hourSelected) {
             alert('Please select a time.');
             return;

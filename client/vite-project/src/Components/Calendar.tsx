@@ -1,36 +1,39 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import MeetingTooltip from './MeetingWidget';
 
-// Utility functions
-const formatTime = (date: Date) => {
-  return `${date.getHours()}:${date.getMinutes() === 0 ? '00' : date.getMinutes()}`;
-};
+export default function Calendar({ meetings, onWeekChange }: any) {
 
-// return all 7 days that there is into my week
-const getWeekDates = (startDate: Date) => {
-  const weekStart = new Date(startDate);
-  const weekDates: Date[] = [];
+  const [hoveredMeeting, setHoveredMeeting] = useState<any>(null);
 
-  // Set the start of the week (Sunday)
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-
-  // Generate the days of the week
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(weekStart);
-    day.setDate(weekStart.getDate() + i);
-    weekDates.push(day);
-  }
-
-  return weekDates;
-};
-
-const Calendar = ({ meetings, onWeekChange }: any) => {
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
     today.setDate(today.getDate() - today.getDay()); // Start with Sunday of the current week
     return today;
   });
 
+
+  // Utility functions
+  const formatTime = (date: Date) => {
+    return `${date.getHours()}:${date.getMinutes() === 0 ? '00' : date.getMinutes()}`;
+  };
+
+  const getWeekDates = (startDate: Date) => {
+    const weekStart = new Date(startDate);
+    const weekDates: Date[] = [];
+
+    // Set the start of the week (Sunday)
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+    // Generate the days of the week
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(weekStart);
+      day.setDate(weekStart.getDate() + i);
+      weekDates.push(day);
+    }
+
+    return weekDates;
+  };
   const weekDays = getWeekDates(currentWeekStart);
 
   const hours = Array.from({ length: 10 }, (_, i) => i + 9); // 9 AM to 7 PM
@@ -73,7 +76,7 @@ const Calendar = ({ meetings, onWeekChange }: any) => {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <h2 className="text-lg font-semibold">
-          {weekDays[0].toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - 
+          {weekDays[0].toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} -
           {weekDays[6].toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
         </h2>
         <button onClick={handleNextWeek} className="p-1 hover:bg-indigo-700 rounded">
@@ -105,14 +108,18 @@ const Calendar = ({ meetings, onWeekChange }: any) => {
                 return (
                   <div
                     key={dayIndex}
-                    className={`p-2 border-r min-h-[64px] ${
-                      meeting ? 'bg-blue-50' : 'hover:bg-gray-50'
-                    }`}
+                    className={`p-2 border-r min-h-[64px] ${meeting ? 'bg-blue-50' : 'hover:bg-gray-50'
+                      }`}
                   >
                     {meeting && (
-                      <div className="text-sm">
+                      <div 
+                        className="text-sm relative"
+                        onMouseEnter={() => setHoveredMeeting(meeting)}
+                        onMouseLeave={() => setHoveredMeeting(null)}
+                      >
                         <div className="font-medium text-blue-800">{meeting.title}</div>
                         <div className="text-blue-600">{meeting.customerName}</div>
+                        {hoveredMeeting === meeting && <MeetingTooltip meeting={meeting} />}
                       </div>
                     )}
                   </div>
@@ -126,4 +133,3 @@ const Calendar = ({ meetings, onWeekChange }: any) => {
   );
 };
 
-export default Calendar;
