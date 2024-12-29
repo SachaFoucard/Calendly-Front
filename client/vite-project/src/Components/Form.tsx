@@ -81,11 +81,10 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
 
         console.log("createMeeting", createMeeting);
 
-        const baseUrl = import.meta.env.MODE === 'development'
+        const baseUrl = import.meta.env.VITE_API_NODE_ENV === 'development'
             ? import.meta.env.VITE_API_LOCAL
             : import.meta.env.VITE_API_VERCEL;
 
-        console.log('baseUrl', baseUrl);
 
         try {
             const response = await fetch(`${baseUrl}/api/meetings/add`, {

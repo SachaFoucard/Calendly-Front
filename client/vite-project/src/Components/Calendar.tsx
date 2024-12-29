@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import MeetingTooltip from './MeetingWidget';
+import NewMeeting from './NewMeeting';
+import { formatISO } from 'date-fns';
+import { add } from 'date-fns';
 
 export default function Calendar({ meetings, onWeekChange }: any) {
 
   const [hoveredMeeting, setHoveredMeeting] = useState<any>(null);
+  const [showModalMeetingCreation, setShowModalMeetingCreation] = useState<boolean>(false);
+  const [meetingToCreate, setMeetingToCreate] = useState<any>(null); // Store the meeting data for modal
+  const [modalPosition, setModalPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 }); // Store modal position
 
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
@@ -68,9 +74,49 @@ export default function Calendar({ meetings, onWeekChange }: any) {
     return date;
   };
 
+  const createMeetingByMe = async (date: Date, hour: number, event: React.MouseEvent) => {
+    const startTime = new Date(date);
+    startTime.setHours(hour, 0, 0, 0); // Set the hour for the clicked slot
+
+    const isoStartTime = new Date(startTime).toISOString();
+
+
+    // Calculate end time by adding 1 hour
+    const endTime = add(startTime, { hours: 1 });
+    const isoEndTime = formatISO(endTime);
+
+    const meeting = {
+      startTime: isoStartTime,  // Start time in ISO format
+      endTime: isoEndTime,  // End time is 1 hour after start time
+      userBooker: import.meta.env.VITE_MY_MAIL,  // Replace with logged-in user's email
+      to: '',  // Target email (placeholder), // #mail to 
+      customerName: 'Sacha Foucard',
+      customerMail: import.meta.env.VITE_MY_MAIL,
+      title: '' // #title
+    };
+
+    // Get position of the clicked cell
+    const { top, left } = (event.target as HTMLElement).getBoundingClientRect();
+
+    // Check if a meeting already exists at the same time
+    const findMeeting = meetings.find((item: any) => item.startTime == meeting.startTime);
+
+    // If a meeting is already booked at this time, return and do not open the modal
+    if (findMeeting) {
+      setShowModalMeetingCreation(false);
+      return; // No modal will open
+    }
+
+    // If no meeting is booked, open the modal to create a new meeting
+    setMeetingToCreate(meeting);
+    setModalPosition({ top, left });
+    setShowModalMeetingCreation(true);
+  };
+
+
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow overflow-hidden ">
       <div className="flex justify-between items-center p-4 bg-indigo-600 text-white">
         <button onClick={handlePreviousWeek} className="p-1 hover:bg-indigo-700 rounded">
           <ChevronLeft className="w-5 h-5" />
@@ -92,13 +138,15 @@ export default function Calendar({ meetings, onWeekChange }: any) {
             {weekDays.map((date, i) => (
               <div key={i} className="p-2 text-center border-r bg-gray-50">
                 <div className="font-medium">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                <div className="text-sm text-gray-500">{date.toLocaleDateString('en-US', { day: 'numeric' })}</div>
+                <div className="text-sm text-gray-500">{date.toLocaleDateString('en-US', { day: 'numeric' })}
+                </div>
               </div>
             ))}
           </div>
 
           {/* Time Slots */}
           {hours.map((hour) => (
+
             <div key={hour} className="grid grid-cols-8 border-b">
               <div className="p-2 border-r bg-gray-50 text-sm">
                 {formatTime(getTimeForHour(hour))}
@@ -108,9 +156,10 @@ export default function Calendar({ meetings, onWeekChange }: any) {
                 return (
                   <div
                     key={dayIndex}
-                    className={`p-2 border-r min-h-[64px] ${meeting ? 'bg-blue-50' : 'hover:bg-gray-50'
-                      }`}
+                    onClick={(event) => createMeetingByMe(date, hour, event)} // Pass the event for position
+                    className={`p-2 border-r min-h-[64px] ${meeting ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
                   >
+
                     {meeting && (
                       <div
                         className="text-sm relative"
@@ -120,6 +169,7 @@ export default function Calendar({ meetings, onWeekChange }: any) {
                         <div className="font-medium text-blue-800">{meeting.title}</div>
                         <div className="text-blue-600">{meeting.customerName}</div>
                         {hoveredMeeting === meeting && <MeetingTooltip meeting={meeting} />}
+
                       </div>
                     )}
                   </div>
@@ -129,6 +179,21 @@ export default function Calendar({ meetings, onWeekChange }: any) {
           ))}
         </div>
       </div>
+      {/* Modal for creating a new meeting */}
+      {showModalMeetingCreation && (
+        <div
+          style={{
+            position: 'absolute',
+            top: modalPosition.top,
+            left: modalPosition.left,
+            zIndex: 9999,
+            transform: 'translate(10px, 10px)' // Optional offset for the modal
+          }}
+          className="bg-white rounded-lg shadow-lg p-4 w-[250px] min-w-[250px]"
+        >
+          <NewMeeting meeting={meetingToCreate} />
+        </div>
+      )}
     </div>
   );
 };

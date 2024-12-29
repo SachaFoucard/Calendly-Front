@@ -12,7 +12,7 @@ const Admin = () => {
       const isoDate = queryDate.toISOString();
       console.log('isoDate', isoDate);
 
-      const baseUrl = import.meta.env.MODE === 'development'
+      const baseUrl = import.meta.env.VITE_API_NODE_ENV === 'development'
         ? import.meta.env.VITE_API_LOCAL
         : import.meta.env.VITE_API_VERCEL;
 

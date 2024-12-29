@@ -20,7 +20,7 @@ export default function TimeAvailable() {
             const cleanedDate = isoDay.split('+')[0];
             console.log('cleanedDate', cleanedDate);
 
-            const baseUrl = import.meta.env.MODE === 'development'
+            const baseUrl = import.meta.env.VITE_API_NODE_ENV === 'development'
                 ? import.meta.env.VITE_API_LOCAL
                 : import.meta.env.VITE_API_VERCEL;
 
