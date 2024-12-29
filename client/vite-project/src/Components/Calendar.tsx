@@ -12,7 +12,6 @@ export default function Calendar({ meetings, onWeekChange }: any) {
     return today;
   });
 
-
   // Utility functions
   const formatTime = (date: Date) => {
     return `${date.getHours()}:${date.getMinutes() === 0 ? '00' : date.getMinutes()}`;
@@ -69,6 +68,7 @@ export default function Calendar({ meetings, onWeekChange }: any) {
     return date;
   };
 
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="flex justify-between items-center p-4 bg-indigo-600 text-white">
@@ -112,7 +112,7 @@ export default function Calendar({ meetings, onWeekChange }: any) {
                       }`}
                   >
                     {meeting && (
-                      <div 
+                      <div
                         className="text-sm relative"
                         onMouseEnter={() => setHoveredMeeting(meeting)}
                         onMouseLeave={() => setHoveredMeeting(null)}

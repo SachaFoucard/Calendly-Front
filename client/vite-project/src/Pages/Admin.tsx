@@ -10,15 +10,22 @@ const Admin = () => {
   const fetchMeetings = async (queryDate: Date) => {
     try {
       const isoDate = queryDate.toISOString();
-      
-      const data = await fetch(
-        `https://calendy-back.vercel.app/api/weeklyMeetings?date=${isoDate}`
-      );
-  
+      console.log('isoDate', isoDate);
+
+      const baseUrl = import.meta.env.MODE === 'development'
+        ? import.meta.env.VITE_API_LOCAL
+        : import.meta.env.VITE_API_VERCEL;
+
+
+      console.log('baseUrl', baseUrl);
+
+      const data = await fetch(`${baseUrl}/api/weeklyMeetings?date=${isoDate}`);
+      console.log('data', data);
+
       if (!data.ok) {
         throw new Error(`Error: ${data.status} ${data.statusText}`);
       }
-  
+
       const json = await data.json();
       setMeetings(json);
       console.log('Fetched meetings:', json);
@@ -32,7 +39,7 @@ const Admin = () => {
     fetchMeetings(currentDate);
   }, [currentDate]); // This will run when currentDate is updated
 
-  
+
   // Navigate to the current week (default view)
   const handleWeekChange = (weekDate: Date | null = null) => {
     const queryDate = weekDate || new Date();
@@ -47,11 +54,11 @@ const Admin = () => {
       </div>
 
       <div className="flex justify-between items-center mb-6">
-      
+
         <h2 className="text-lg font-semibold text-gray-800">
           Week of {currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
         </h2>
-        
+
       </div>
 
       <Calendar meetings={meetings} onWeekChange={handleWeekChange} />
@@ -75,13 +82,12 @@ const Admin = () => {
                   </div>
                   <div className="text-right">
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        meeting.status === 'confirmed'
-                          ? 'bg-green-100 text-green-800'
-                          : meeting.status === 'pending'
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${meeting.status === 'confirmed'
+                        ? 'bg-green-100 text-green-800'
+                        : meeting.status === 'pending'
                           ? 'bg-yellow-100 text-yellow-800'
                           : 'bg-red-100 text-red-800'
-                      }`}
+                        }`}
                     >
                       {meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}
                     </span>

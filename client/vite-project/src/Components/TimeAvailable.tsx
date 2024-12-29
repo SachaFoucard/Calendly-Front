@@ -18,9 +18,14 @@ export default function TimeAvailable() {
         try {
             Setloading(true)
             const cleanedDate = isoDay.split('+')[0];
+            console.log('cleanedDate', cleanedDate);
+
+            const baseUrl = import.meta.env.MODE === 'development'
+                ? import.meta.env.VITE_API_LOCAL
+                : import.meta.env.VITE_API_VERCEL;
 
             const response = await fetch(
-                `https://calendy-back.vercel.app/api/meetings/day?day=${cleanedDate}`
+                `${baseUrl}/api/meetings/day?day=${cleanedDate}`
             );
             if (!response.ok) {
                 console.error('Failed to fetch meetings:', response.statusText);

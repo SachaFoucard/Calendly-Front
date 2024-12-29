@@ -52,7 +52,7 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
         setFormattedEndTime(formattedEndTime);
         setIsoEndTime(isoEndTime);
     };
-    
+
     useEffect(() => {
 
         if (dayInformation && hourSelected) {
@@ -64,7 +64,7 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
     }, [dayInformation, hourSelected]);
 
     // Handle form submission
-    const onSubmit: SubmitHandler<Meeting> = async (data:any) => {
+    const onSubmit: SubmitHandler<Meeting> = async (data: any) => {
         if (!hourSelected) {
             alert('Please select a time.');
             return;
@@ -81,8 +81,14 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
 
         console.log("createMeeting", createMeeting);
 
+        const baseUrl = import.meta.env.MODE === 'development'
+            ? import.meta.env.VITE_API_LOCAL
+            : import.meta.env.VITE_API_VERCEL;
+
+        console.log('baseUrl', baseUrl);
+
         try {
-            const response = await fetch('https://calendy-back.vercel.app/api/meetings/add', {
+            const response = await fetch(`${baseUrl}/api/meetings/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
