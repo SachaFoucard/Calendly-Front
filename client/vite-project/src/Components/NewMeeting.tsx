@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -53,9 +53,9 @@ export default function NewMeeting({ meeting }: any) {
    
 
     return (
-        <div className="absolute bg-orange-100 rounded-lg shadow-lg border border-gray-200 p-3 min-w-[200px]">
+        <div className="absolute bg-blue-50 rounded-lg shadow-lg border border-gray-200 p-3 min-w-[200px]">
             <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900">
+                <h4 className="font-small text-gray-400">
                     {title || 'New Meeting'}
                 </h4>
                 <div className="text-sm text-gray-600">

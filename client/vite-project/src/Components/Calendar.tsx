@@ -74,12 +74,16 @@ export default function Calendar({ meetings, onWeekChange }: any) {
     return date;
   };
 
+  const PastDate = (date: Date): boolean => {
+    const today = new Date()
+    return today > date;
+  }
+
   const createMeetingByMe = async (date: Date, hour: number, event: React.MouseEvent) => {
     const startTime = new Date(date);
     startTime.setHours(hour, 0, 0, 0); // Set the hour for the clicked slot
 
     const isoStartTime = new Date(startTime).toISOString();
-
 
     // Calculate end time by adding 1 hour
     const endTime = add(startTime, { hours: 1 });
@@ -101,8 +105,10 @@ export default function Calendar({ meetings, onWeekChange }: any) {
     // Check if a meeting already exists at the same time
     const findMeeting = meetings.find((item: any) => item.startTime == meeting.startTime);
 
-    // If a meeting is already booked at this time, return and do not open the modal
-    if (findMeeting) {
+    const today = new Date()
+    const beforeToday = today > date
+    // If a meeting is already booked at this time or the date is in the past, return and do not open the modal 
+    if (findMeeting ||  beforeToday) { // 
       setShowModalMeetingCreation(false);
       return; // No modal will open
     }
@@ -112,8 +118,6 @@ export default function Calendar({ meetings, onWeekChange }: any) {
     setModalPosition({ top, left });
     setShowModalMeetingCreation(true);
   };
-
-
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden ">
@@ -157,7 +161,7 @@ export default function Calendar({ meetings, onWeekChange }: any) {
                   <div
                     key={dayIndex}
                     onClick={(event) => createMeetingByMe(date, hour, event)} // Pass the event for position
-                    className={`p-2 border-r min-h-[64px] ${meeting ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                    className={`p-2 border-r min-h-[64px] ${meeting ? 'bg-blue-50' : ''} ${PastDate(date) ? 'bg-gray-100' : 'hover:bg-blue-50'}`}
                   >
 
                     {meeting && (
