@@ -79,7 +79,6 @@ export default function Form({ isActive, dayInformation, hourSelected }: { isAct
             to: 'sachafoucard8@gmail.com', // Placeholder email, adjust if necessary
         };
 
-        console.log("createMeeting", createMeeting);
 
         const baseUrl = import.meta.env.VITE_API_NODE_ENV === 'development'
             ? import.meta.env.VITE_API_LOCAL

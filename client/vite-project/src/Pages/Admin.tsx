@@ -10,17 +10,14 @@ const Admin = () => {
   const fetchMeetings = async (queryDate: Date) => {
     try {
       const isoDate = queryDate.toISOString();
-      console.log('isoDate', isoDate);
 
       const baseUrl = import.meta.env.VITE_API_NODE_ENV === 'development'
         ? import.meta.env.VITE_API_LOCAL
         : import.meta.env.VITE_API_VERCEL;
 
 
-      console.log('baseUrl', baseUrl);
 
       const data = await fetch(`${baseUrl}/api/weeklyMeetings?date=${isoDate}`);
-      console.log('data', data);
 
       if (!data.ok) {
         throw new Error(`Error: ${data.status} ${data.statusText}`);
@@ -28,7 +25,7 @@ const Admin = () => {
 
       const json = await data.json();
       setMeetings(json);
-      console.log('Fetched meetings:', json);
+
     } catch (error) {
       console.error('Error fetching meetings:', error);
     }

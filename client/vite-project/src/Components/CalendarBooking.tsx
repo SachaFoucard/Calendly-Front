@@ -23,7 +23,6 @@ const CalendarBooking = () => {
 
     const handleDateClick = (dayNumber: number) => {
         const selectedDate = new Date(currentYear, currentMonth, dayNumber);
-        console.log('selectedDate', selectedDate);
 
         setSelectedDay(selectedDate); // Update selected day
         setDayClicked(formatISO(selectedDate)); // Set ISO date in context

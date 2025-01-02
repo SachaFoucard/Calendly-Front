@@ -18,7 +18,6 @@ export default function TimeAvailable() {
         try {
             Setloading(true)
             const cleanedDate = isoDay.split('+')[0];
-            console.log('cleanedDate', cleanedDate);
 
             const baseUrl = import.meta.env.VITE_API_NODE_ENV === 'development'
                 ? import.meta.env.VITE_API_LOCAL
@@ -27,6 +26,7 @@ export default function TimeAvailable() {
             const response = await fetch(
                 `${baseUrl}/api/meetings/day?day=${cleanedDate}`
             );
+            
             if (!response.ok) {
                 console.error('Failed to fetch meetings:', response.statusText);
                 return;
